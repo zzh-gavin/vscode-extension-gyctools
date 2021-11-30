@@ -13,10 +13,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('gyctools.generateYourCodes', (item) => {
 
-		let result = vscode.commands.executeCommand('sqltools.describeTable',item);
-
-		console.log(result);
-
 		const tableName = item.value;
 		const dataBaseName = item.parent.parent.value;
 		const conn = item.conn;
