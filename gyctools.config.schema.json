@@ -1,0 +1,107 @@
+{
+    "type": "object",
+    "required": [
+        "projectName",
+        "projectPath",
+        "dataBaseList"
+    ],
+    "properties": {
+        "enabled": {
+            "title": "Enabled",
+            "description": "Open or close this project gvctools config.",
+            "type": "boolean"
+        },
+        "projectName": {
+            "title": "Project Name",
+            "type": "string"
+        },
+        "projectPath": {
+            "title": "Project Path",
+            "description": "This property is factor file path for output code file. ",
+            "type": "string"
+        },
+        "baseModelProperties": {
+            "title": "Base Model Properties",
+            "description": "A list of property names in entity's based class.Then they can used in template for filter then out result.",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "dataBaseList": {
+            "title": "DataBaseList",
+            "description": "The project releated database info list. When you select the target table's database in this list,tool will work or not.",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": [
+                    "dataBaseName","templateList"
+                ],
+                "properties": {
+                    "dataBaseName": {
+                        "title": "Database Name",
+                        "description": "One of the project releated database name. When you select the target table's database name matched tool will work or not.",
+                        "type": "string"
+                    },
+                    "tableNamePrefix": {
+                        "title": "Table Name Prefix",
+                        "description": "Define the throwable table name prefix when genereate the class name. eg:'tableNamePrefix':'TB_',then TB_TABLE_Name_21 -> tableName21",
+                        "type": "string"
+                    },
+                    "customsAttributes": {
+                        "title": "Customs Attributes",
+                        "description": "Define your usefull attributes，so you can use it in Nunjucks templates by {{customsAttributes.yourAttributes}}.",
+                        "type": "object"
+                    },
+                    "customsTypeInterpreterConfig": {
+                        "type": "object",
+                        "required": []
+                    },
+                    "templatePath": {
+                        "title": "Customs template path",
+                        "description": "Define your templates and set their location at this",
+                        "type": "string",
+                        "minimum": 1
+                    },
+                    "templateList": {
+                        "title": "Template List",
+                        "description": "All code source template must defined in this list and when it's enabled then code file will be generate in the outPath.",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "templateName",
+                                "outFileType",
+                                "outPath"
+                            ],
+                            "properties": {
+                                "templateName": {
+                                    "title": "Template Name",
+                                    "description": "The Nunjucks template file name.",
+                                    "type": "string"
+                                },
+                                "outPath": {
+                                    "title": "Out File Path",
+                                    "description": "The output filename's location.",
+                                    "type": "string"
+                                },
+                                "outFileType": {
+                                    "title": "Out File Type",
+                                    "description": "The output filename's additions. eg: 'outFileType':'Reader.java'  then the code file will be named 'classNameReader.java'",
+                                    "type": "string"
+                                },
+                                "enabled": {
+                                    "title": "Enabled",
+                                    "description": "This template will be done when this value equal to true.",
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+        }
+    }
+}

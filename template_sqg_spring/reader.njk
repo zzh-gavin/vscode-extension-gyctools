@@ -1,0 +1,10 @@
+package {{ customsAttributes.readerPackageName }};
+
+import org.springframework.stereotype.Repository;
+import com.sqg.reader.base.BaseReader;
+import com.sqg.model.{{className}};
+
+@Repository
+public interface {{className}}Reader  extends BaseReader<{{className}}> {
+  
+}

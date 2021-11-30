@@ -1,0 +1,28 @@
+package {{ customsAttributes.modelPackageName }};
+
+import com.sqg.model.base.BaseModel;{% for import in importArray %}
+import {{ import }};{% endfor %}
+
+public class {{className}}  extends BaseModel {
+    
+    {% for property in properties -%}
+        {% if property.isInBaseModel==false and property.columnName != primaryKey -%}
+    private {{ property.propertyType }} {{ property.propertyName }};
+        {%- endif %}
+    {% endfor -%}
+    {% for property in properties -%}
+    {% if primaryKey and property.columnName == primaryKey -%}
+    public String get{{property.methodName}}() {
+            return super.id;
+    }
+    {%- endif -%}
+    {% if property.isInBaseModel==false and property.columnName != primaryKey %}
+    public {{ property.propertyType }} get{{ property.methodName }}(){
+        return this.{{ property.propertyName }};
+    }
+    public void set{{ property.methodName }}( {{ property.propertyType }} {{ property.propertyName }}){
+        this.{{ property.propertyName }} = {{ property.propertyName }};
+    }
+    {% endif -%}
+    {% endfor %}
+}

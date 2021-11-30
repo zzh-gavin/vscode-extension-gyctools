@@ -1,0 +1,28 @@
+package {{ customsAttributes.serviceImplPackageName }};
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import {{customsAttributes.readerPackageName}}.{{className}}Reader;
+import {{customsAttributes.writerPackageName}}.{{className}}Writer;
+import {{customsAttributes.servicePackageName}}.{{className}}Service;
+
+@Service
+public class {{className}}ServiceImpl  extends {{className}}Service {
+  
+    @Autowired
+	private {{className}}Reader reader;
+
+    @Autowired
+	private {{className}}Writer writer;
+
+    @Override
+	protected {{className}}Reader reader() {
+		return reader;
+	}
+
+	@Override
+	protected {{className}}Writer writer() {
+		return writer;		
+	}
+
+}
