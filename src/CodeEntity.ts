@@ -1,4 +1,5 @@
 import { CodeProperty } from "./CodeProperty";
+import { GycTools } from "./GycTools";
 import { StringUtils } from './StringUtils';
 import { TypeInterpreter, TypeInterpreterFactory } from './TypeInterpreter';
 
@@ -28,9 +29,9 @@ export class CodeEntity {
 
     private typeInterpreter: TypeInterpreter;
 
-    constructor(dbType: string, tableName: string, queryResult: any, baseModelProperties: string[], dataBaseConfig: any) {
+    constructor(tableName: string, queryResult: any, baseModelProperties: string[], dataBaseConfig: GycTools.DatabaseConfig) {
         this.typeInterpreter = TypeInterpreterFactory.getInstance(dataBaseConfig);
-        this.dbType = dbType;
+        this.dbType = dataBaseConfig.databaseType;
         this.tableName = tableName;
         this.properties = new Array<CodeProperty>();
         this.tableNamePrefix = dataBaseConfig.tableNamePrefix;

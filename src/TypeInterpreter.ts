@@ -9,7 +9,6 @@ export interface TypeInterpreter {
 }
 
 
-
 export class CustomsTypeInterpreter implements TypeInterpreter {
 
     typeInterpreterConfig: any;
