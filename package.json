@@ -2,9 +2,9 @@
 	"name": "gyctools",
 	"displayName": "Generate Your Codes From DataBase",
 	"description": "Generate Your Codes From DataBase by Nunjuck Templating.",
-	"publisher": "zzh-gavin",
+	"publisher": "zzhgavin",
 	"author": "zzh-gavin<leechzhao3@hotmail.com>",
-	"version": "0.0.1",
+	"version": "0.0.6",
 	"license": "MIT",
 	"preview": false,
 	"engines": {
@@ -17,14 +17,18 @@
 	],
 	"keywords": [
 		"mysql",
+		"mybatis",
 		"database",
 		"dto",
 		"ormap",
 		"ormapping",
 		"gen",
-		"generate"
+		"generate",
+		"shengqugames",
+		"sqg"
 	],
 	"icon": "icon/icon-256.png",
+	"repository": {"type": "git","url": "https://github.com/zzh-gavin/vscode-extension-gyctools.git"},
 	"extensionDependencies": [
 		"mtxr.sqltools"
 	],
