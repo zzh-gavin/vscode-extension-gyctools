@@ -1,12 +1,22 @@
 # GYC TOOLS
 
-This is a tool for generate your code(all programming language up to you) or maybatis map-file from database table definition.Currently we only support MySQL.
+This is a tool for generate your code(all programming language up to you) or maybatis map-file from database table definition.
 
 ## Extension Dependencies
 
-### [SQLTools](https://github.com/mtxr/vscode-sqltools.git)
+### [SQLTools](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools)
 
-If want use this tools,you must install [SQLTools](https://github.com/mtxr/vscode-sqltools.git). It's a very popular database manage vs-extension.
+If want use this tools,you must install [SQLTools](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools). It's a very popular extension for database manage.
+
+## Database Type supported
+
+### MySQL
+
+Install [SQLTools](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools) and [SQLTools MySQL/MariaDB driver](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools-driver-mysql) is necessarily.And the connection setting mast use 'Server and Port' and the password need select 'Save password' if not this tool can't connect to db server.
+
+### MsSQL
+
+Install [SQLTools](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools) and [SQLTools MicrosoftSQL Server/Azure driver](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools-driver-mssql) is necessarily. And the connection setting mast use 'Server and Port' and the password need select 'Save password' if not this tool can't connect to db server.
 
 ## Usage
 
@@ -58,39 +68,121 @@ If want use this tools,you must install [SQLTools](https://github.com/mtxr/vscod
 
 ## Extension Config File Manual
 
-when tools activating,is will read project config info from "./vscode/gyctools.config.json". This section will told you how to make it or you can see the [config schema](https://gskd.sdoprofile.com/schema/gyctools.config.schema.json)
+When tools activated,it will read tool config from "./vscode/gyctools.config.json". This section will told you how to make it or you can see the [config schema](https://gskd.sdoprofile.com/schema/gyctools.config.schema.json)
 
 ## Code Template Info
 
 Tools has a bundle of templates in extension installation directory "template-sqg-spring",it's a java-spring and a private template demo you to edit them for youself style. Alternatively,you can contact us for help. And then you can set the template folder in gyctools.config by "dataBaseList.item.templatePath".
 
+### Language Type Interpreter
+
+Gyc tool has tow type interpreter provided:
+If that is not what your want,then can define a 'customsTypeInterpreterConfig' in 'gyctools.config.json' like the 'gyctools.config.json Demo'.
+
+* MySqlToJavaTypeInterpreter
+
+  ``` typescript
+   static dbTypeToJavaTypeInterpreterConfig: any = {
+        'int': { 'result': 'Integer' },
+        'tinyint': { 'result': 'Integer' },
+        'smallint': { 'result': 'Integer' },
+        'datetime': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
+        'timestamp': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
+        'date': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
+        'time': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
+        'decimal': { 'result': 'BigDecimal', 'importTypeName': 'java.math.BigDecimal' },
+        'bit': { 'result': 'Boolean' },
+        'bigint': { 'result': 'Long' },
+        'default': { 'result': 'String' }
+    };
+  ```
+
+* MsSqlToJavaTypeInterpreter
+
+  ``` typescript
+   static dbTypeToJavaTypeInterpreterConfig: any = {
+        'int': { 'result': 'Integer' },
+        'tinyint': { 'result': 'Integer' },
+        'smallint': { 'result': 'Integer' },     
+        'datetime': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
+        'smalldatetime': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
+        'timestamp': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
+        'date': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
+        'time': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
+        'decimal': { 'result': 'BigDecimal', 'importTypeName': 'java.math.BigDecimal' },
+        'numeric': { 'result': 'BigDecimal', 'importTypeName': 'java.math.BigDecimal' },
+        'money': { 'result': 'BigDecimal', 'importTypeName': 'java.math.BigDecimal' },
+        'bit': { 'result': 'Boolean' },
+        'bigint': { 'result': 'Long' },
+        'default': { 'result': 'String' }
+    };
+  ```
+
 ### gyctools.config.json Demo
 
 ``` json
 {
-    "$schema": "https://gskd.sdoprofile.com/schema/gyctools.config.schema.v1.json",
+    "$schema": "https://gskd.sdoprofile.com/schema/gyctools.config.schema.v2.json",
     "projectName": "gvctoolsdemo",
     "projectPath": "gvctoolsdemo",
     "enabled": true,    
-    "baseModelProperties": [
-        "id",
-        "dr",
-        "dataVersion",
-        "createTime",
-        "updateTime"
-    ],
+    "openFileWhenComplete": false,
+    "templatePath":"",
     "dataBaseList": [
         {
             "dataBaseName": "gyc_tools",
             "tableNamePrefix": "TB_",
+            "templateList": [
+                {
+                    "templateName": "model.njk",
+                    "outFileType": ".java",
+                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/model/",
+                    "enabled": true
+                },
+                {
+                    "templateName": "reader.njk",
+                    "outFileType": "Reader.java",
+                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/reader/",
+                    "enabled": true
+                },
+                {
+                    "templateName": "reader_map.njk",
+                    "outFileType": ".xml",
+                    "outPath": "/gvctoolsdemo-model/src/main/resources/mappers/reader/",
+                    "enabled": true
+                },
+                {
+                    "templateName": "writer.njk",
+                    "outFileType": "Writer.java",
+                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/writer/",
+                    "enabled": true
+                },
+                {
+                    "templateName": "writer_map.njk",
+                    "outFileType": ".xml",
+                    "outPath": "/gvctoolsdemo-model/src/main/resources/mappers/writer/",
+                    "enabled": true
+                },
+                {
+                    "templateName": "service.njk",
+                    "outFileType": "Service.java",
+                    "outPath": "/gvctoolsdemo-service/src/main/java/com/sqg/service/",
+                    "enabled": true
+                },
+                {
+                    "templateName": "service_impl.njk",
+                    "outFileType": "ServiceImpl.java",
+                    "outPath": "/gvctoolsdemo-service/src/main/java/com/sqg/service/impl/",
+                    "enabled": true
+                }
+            ],
             "customsAttributes": {
                 "modelPackageName": "com.sqg.model",
-                "readerPackageName": "com.sqg.reader.config",
-                "writerPackageName": "com.sqg.writer.config",
+                "readerPackageName": "com.sqg.reader",
+                "writerPackageName": "com.sqg.writer",
                 "servicePackageName": "com.sqg.service",
                 "serviceImplPackageName": "com.sqg.service.impl"
             },
-            "openFileWhenComplete": true,
             "customsTypeInterpreterConfig": {
                 "int": {
                     "result": "Integer"
@@ -133,52 +225,15 @@ Tools has a bundle of templates in extension installation directory "template-sq
                 "default": {
                     "result": "String"
                 }
-            },
-            "templateList": [
-                {
-                    "templateName": "model.njk",
-                    "outFileType": ".java",
-                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/model/",
-                    "enabled": true
-                },
-                {
-                    "templateName": "reader.njk",
-                    "outFileType": "Reader.java",
-                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/reader/config/",
-                    "enabled": true
-                },
-                {
-                    "templateName": "reader_map.njk",
-                    "outFileType": ".xml",
-                    "outPath": "/gvctoolsdemo-model/src/main/resources/mappers/reader/config/",
-                    "enabled": true
-                },
-                {
-                    "templateName": "writer.njk",
-                    "outFileType": "Writer.java",
-                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/writer/config/",
-                    "enabled": true
-                },
-                {
-                    "templateName": "writer_map.njk",
-                    "outFileType": ".xml",
-                    "outPath": "/gvctoolsdemo-model/src/main/resources/mappers/writer/config/",
-                    "enabled": true
-                },
-                {
-                    "templateName": "service.njk",
-                    "outFileType": "Service.java",
-                    "outPath": "/gvctoolsdemo-service/src/main/java/com/sqg/service/",
-                    "enabled": true
-                },
-                {
-                    "templateName": "service_impl.njk",
-                    "outFileType": "ServiceImpl.java",
-                    "outPath": "/gvctoolsdemo-service/src/main/java/com/sqg/service/impl/",
-                    "enabled": true
-                }
-            ]
+            }
         }
+    ],
+    "baseModelProperties": [
+        "id",
+        "dr",
+        "dataVersion",
+        "createTime",
+        "updateTime"
     ]
 }
 ```
@@ -193,7 +248,7 @@ you also can add config schema relation by vscode setting eg "json.schemas"::
         "fileMatch": [
             "gyctools.config.json"
         ],
-        "url": "https://gskd.sdoprofile.com/schema/gyctools.config.schema.v1.json"
+        "url": "https://gskd.sdoprofile.com/schema/gyctools.config.schema.v2.json"
     }
     
 ```
