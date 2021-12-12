@@ -1,3 +1,5 @@
+import { GycTools } from "./GycTools";
+
 export interface TypeInterpreter {
 
     typeInterpreterConfig: any;
@@ -35,12 +37,34 @@ export class CustomsTypeInterpreter implements TypeInterpreter {
     }
 }
 
-export class MysqlToJavaTypeInterpreter extends CustomsTypeInterpreter {
-    static mysqlToJavaInterpreterConfig: any = {
+
+export class MsSqlToJavaTypeInterpreter extends CustomsTypeInterpreter {
+    static dbTypeToJavaTypeInterpreterConfig: any = {
+        'int': { 'result': 'Integer' },
+        'tinyint': { 'result': 'Integer' },
+        'smallint': { 'result': 'Integer' },     
+        'datetime': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
+        'smalldatetime': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
+        'timestamp': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
+        'date': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
+        'time': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
+        'decimal': { 'result': 'BigDecimal', 'importTypeName': 'java.math.BigDecimal' },
+        'numeric': { 'result': 'BigDecimal', 'importTypeName': 'java.math.BigDecimal' },
+        'money': { 'result': 'BigDecimal', 'importTypeName': 'java.math.BigDecimal' },
+        'bit': { 'result': 'Boolean' },
+        'bigint': { 'result': 'Long' },
+        'default': { 'result': 'String' }
+    };
+    constructor() {
+        super(MsSqlToJavaTypeInterpreter.dbTypeToJavaTypeInterpreterConfig);
+    }
+}
+
+export class MySqlToJavaTypeInterpreter extends CustomsTypeInterpreter {
+    static dbTypeToJavaTypeInterpreterConfig: any = {
         'int': { 'result': 'Integer' },
         'tinyint': { 'result': 'Integer' },
         'smallint': { 'result': 'Integer' },
-        'varchar': { 'result': 'String' },
         'datetime': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
         'timestamp': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
         'date': { 'result': 'Date', 'importTypeName': 'java.util.Date' },
@@ -51,20 +75,22 @@ export class MysqlToJavaTypeInterpreter extends CustomsTypeInterpreter {
         'default': { 'result': 'String' }
     };
     constructor() {
-        super(MysqlToJavaTypeInterpreter.mysqlToJavaInterpreterConfig);
+        super(MySqlToJavaTypeInterpreter.dbTypeToJavaTypeInterpreterConfig);
     }
 }
 
 export class TypeInterpreterFactory {
-    static getInstance(dataBaseConfig: any): TypeInterpreter {
+    static getInstance(dataBaseConfig: GycTools.DatabaseConfig): TypeInterpreter {
         if (dataBaseConfig.customsTypeInterpreterConfig) {
             return new CustomsTypeInterpreter(dataBaseConfig.customsTypeInterpreterConfig);
         } else {
-            switch (dataBaseConfig.dataBaseType) {
-                case 'MySql':
-                    return new MysqlToJavaTypeInterpreter();
+            switch (dataBaseConfig.databaseType.toLowerCase()) {
+                case 'mysql':
+                    return new MySqlToJavaTypeInterpreter();
+                case 'mssql':
+                    return new MsSqlToJavaTypeInterpreter();
                 default:
-                    return new MysqlToJavaTypeInterpreter();
+                    return new MySqlToJavaTypeInterpreter();
             }
         }
     }

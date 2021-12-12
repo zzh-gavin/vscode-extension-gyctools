@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { CodeEntity } from './CodeEntity';
 import { GycTools } from './GycTools';
+import { columnQuerierFactory, ColumnQuerier } from './DataBase';
 
 export class CodeGenerator {
 
@@ -17,49 +18,29 @@ export class CodeGenerator {
     sourceDatabaseConfig: GycTools.DatabaseConfig;
 
 
-    readonly dbConnect: mysql.Connection;
+    readonly columnQuerier:ColumnQuerier;
 
     constructor(context: vscode.ExtensionContext, selectedItem: any, targetProject: GycTools.ProjectConfig) {
         this.context = context;
-
-        this.selectedConnection = selectedItem.conn;
-        this.selectedDataBase = selectedItem.parent.parent.value;
         this.selectedTableName = selectedItem.value;
-
         this.targetProject = targetProject;
+        this.columnQuerier=columnQuerierFactory(selectedItem);
         this.sourceDatabaseConfig = this.getSourceDatabase();
-
-        this.dbConnect = mysql.createConnection({
-            host: this.selectedConnection.server,
-            port: this.selectedConnection.port,
-            user: this.selectedConnection.username,
-            password: this.selectedConnection.password,
-            database: this.selectedConnection.database
-        });
-
     }
 
-    generate() {
-        const sqlCommand = `SELECT * FROM information_schema.COLUMNS where TABLE_NAME = '${this.selectedTableName}' AND TABLE_SCHEMA ='${this.selectedDataBase}' `;
-        this.dbConnect.connect();
-        const pq = GycTools.Utils.getColumnInfo(this.dbConnect, sqlCommand);
-        pq.then((result) => {
-            //console.log(result);
-            let codeEntity = new CodeEntity(this.selectedTableName, result, this.targetProject.baseModelProperties, this.sourceDatabaseConfig);
-            //get template path
-            let templatePath = path.join(this.context.extensionPath, GycTools.Constants.defaultTemplateDirectory);
-            if (this.sourceDatabaseConfig.templatePath && this.sourceDatabaseConfig.templatePath.length > 0) {
-                templatePath = path.join(this.sourceDatabaseConfig.templatePath);
-            }
+    generateNew(){
+        this.columnQuerier.getTableColumnInfo().then((columnArray)=>{
+            let codeEntity = new CodeEntity(this.columnQuerier, columnArray, this.targetProject.baseModelProperties, this.sourceDatabaseConfig);
+
+            const templatePath = GycTools.Utils.getTemplatePath(this.context,this.targetProject);
             if (!fs.existsSync(templatePath)) {
                 vscode.window.showErrorMessage('template path error');
                 return;
             }
-            nunjucks.configure(templatePath, { autoescape: false }); //config template path
 
+            nunjucks.configure(templatePath, { autoescape: false,trimBlocks:true,lstripBlocks:true }); //config template path
             let temlpateList: any[] = this.sourceDatabaseConfig.templateList; //get templates list config
             temlpateList = temlpateList.filter((e) => { return e.enabled === undefined || e.enabled === true; });
-
             temlpateList.forEach((t) => {
                 codeEntity.template = t;
                 const renderString = nunjucks.render(t.templateName, codeEntity); //render code
@@ -79,11 +60,13 @@ export class CodeGenerator {
                     vscode.window.showErrorMessage('template error:', t.templateName);
                 }
             });
-            vscode.window.showInformationMessage('gyctools:generate successfully');
+            vscode.window.showInformationMessage('gyctools:generate successfully','OK');
+
         }).catch((error) => {
-            vscode.window.showErrorMessage(error);
+            console.error(error);
+            vscode.window.showErrorMessage(error.message);
         }).finally(() => {
-            this.dbConnect.end();
+            this.columnQuerier.close();
         });
     }
 
@@ -92,12 +75,9 @@ export class CodeGenerator {
         if (!sourceDatabaseConfig) {
             if (this.targetProject && this.targetProject.dataBaseList.length >= 0) {
                 sourceDatabaseConfig = this.targetProject.dataBaseList[0];
-                sourceDatabaseConfig.databaseType = this.selectedConnection.driver;
             } else {
                 vscode.window.showErrorMessage('target database is not in config.');
             }
-        } else {
-            sourceDatabaseConfig.databaseType = this.selectedConnection.driver;
         }
         return sourceDatabaseConfig;
     }

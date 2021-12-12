@@ -2,6 +2,7 @@ import { CodeProperty } from "./CodeProperty";
 import { GycTools } from "./GycTools";
 import { StringUtils } from './StringUtils';
 import { TypeInterpreter, TypeInterpreterFactory } from './TypeInterpreter';
+import { ColumnQuerier } from './DataBase';
 
 export class CodeEntity {
 
@@ -29,17 +30,18 @@ export class CodeEntity {
 
     private typeInterpreter: TypeInterpreter;
 
-    constructor(tableName: string, queryResult: any, baseModelProperties: string[], dataBaseConfig: GycTools.DatabaseConfig) {
+    constructor(columnQuerier: ColumnQuerier, queryResult: any, baseModelProperties: string[], dataBaseConfig: GycTools.DatabaseConfig) {
+        dataBaseConfig.databaseType = columnQuerier.databaseType;
         this.typeInterpreter = TypeInterpreterFactory.getInstance(dataBaseConfig);
-        this.dbType = dataBaseConfig.databaseType;
-        this.tableName = tableName;
+        this.dbType = columnQuerier.databaseType;
+        this.tableName = columnQuerier.tableName;
         this.properties = new Array<CodeProperty>();
         this.tableNamePrefix = dataBaseConfig.tableNamePrefix;
         if (!this.tableNamePrefix) {
             this.className = StringUtils.toUpperCamelCase(this.tableName);
         } else {
-            if ( this.tableNamePrefix.length>0 &&  tableName.startsWith(this.tableNamePrefix) ) {
-                this.className = StringUtils.toUpperCamelCase(tableName.substring(this.tableNamePrefix.length));
+            if ( this.tableNamePrefix.length>0 &&  this.tableName.startsWith(this.tableNamePrefix) ) {
+                this.className = StringUtils.toUpperCamelCase(this.tableName.substring(this.tableNamePrefix.length));
             } else {
                 this.className = StringUtils.toUpperCamelCase(this.tableName);
             }

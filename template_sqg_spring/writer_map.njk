@@ -5,24 +5,20 @@
 	<insert id="insert"  {% if autoIncrementKey %} useGeneratedKeys="true" keyColumn="{{autoIncrementKey}}" keyProperty="id" {%- endif %} >
 		insert into {{ tableName }} 
 		(
-			{% for property in properties -%}
-				{% if property.isInBaseModel==false and property.isAutoIncrement==false -%}
+			{% for property in properties %}
+				{% if property.isInBaseModel==false and property.isAutoIncrement==false %}
         	{{ property.columnName }},
-				{%- endif -%}
-				{% if loop.index%4 == 0 and not loop.last %}
-				{% endif -%}
-			{% endfor -%}
+				{% endif %}
+			{% endfor %}
 			create_time, update_time,dr, data_version
 		) values
 		<foreach collection="list" item="l" separator=",">
 		(
-			{% for property in properties -%}
-				{% if property.isInBaseModel==false and property.isAutoIncrement==false -%}
+			{% for property in properties %}
+				{% if property.isInBaseModel==false and property.isAutoIncrement==false %}
         	#{l.{{ property.propertyName }}},
-				{%- endif -%}
-			{%- if loop.index%4 == 0 and not loop.last %}
-			{% endif -%}
-			{%- endfor -%}
+				{% endif %}
+			{% endfor %}
 			#{l.createTime},#{l.updateTime},0, 1
 		)
 		</foreach>
@@ -30,47 +26,43 @@
 
 	<update id="update" parameterType="{{ customsAttributes.modelPackageName }}.{{ className }}">
 		update {{ tableName }} set 
-		{% for property in properties -%}
-			{% if property.isInBaseModel==false and property.isAutoIncrement==false -%}
-        	{{ property.columnName }} = #{ {{ property.propertyName }} },
-			{%- endif -%}
-			{%- if loop.index%2 == 0 and not loop.last %}
-			{% endif -%}
-		{%- endfor -%}
+		{% for property in properties %}
+			{% if property.isInBaseModel==false and property.isAutoIncrement==false %}
+        	{{ property.columnName }} = #{ {{- property.propertyName }}},
+			{% endif %}
+		{% endfor %}
 		<if test="dr==1">
 			create_time = #{createTime},
 			update_time = #{updateTime},
 			dr = 1,
 		</if>
 			DATA_VERSION = data_version + 1
-		{% if primaryKey -%}
+		{% if primaryKey %}
 		where {{primaryKey}} = #{id}
-		{%- endif %}
-			and data_version = #{dataVersion}
+		{% endif %}
+		and data_version = #{dataVersion}
 	</update>
 
 	<delete id="deleteByWhere" parameterType="com.sqg.sql.Where">
-		delete from
-		{{ tableName }}
+		delete from {{ tableName }}
 		${whereHead}
-		{%- if primaryKey %}
+		{% if primaryKey %}
 		<if test="id != null">
 			{{primaryKey}} = #{id} and
 		</if>
-		{% endif -%}
+		{% endif %}
 		${whereClause}
 	</delete>
 
-	{% if primaryKey -%}
+	{% if primaryKey %}
 	<delete id="deleteByBean">
-		delete
-		from {{ tableName }}
+		delete	from {{ tableName }}
 		where {{primaryKey}} in (
 		<foreach collection="list" item="l" separator=",">
 			#{l.id}
 		</foreach>
 		)
 	</delete>
-	{% endif -%}
+	{% endif %}
 
 </mapper>

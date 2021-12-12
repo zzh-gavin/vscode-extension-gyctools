@@ -5,47 +5,46 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { GycTools } from './GycTools';
 import { CodeGenerator } from './CodeGenerator';
+import { FileExplorer } from './fileExplorer';
+import { TemplateCompletionItemProvider } from './templateCompletionItemProvider';
+
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	context.subscriptions.push(vscode.commands.registerCommand('gyctools.generateYourCodes', (item) => {
+	GycTools.Utils.inistializeTemplate(context);
 
-		let targetProject: any;
-		let hasConfigFile = false;
-		vscode.workspace.workspaceFolders?.forEach((f) => {
-			var configFile = path.join(f.uri.fsPath, GycTools.Constants.projectConfigPath, GycTools.Constants.configFileName);
-			if (fs.existsSync(configFile)) {
-				hasConfigFile = true;
-				var configString = fs.readFileSync(configFile).toString();
-				let projectConfig:GycTools.ProjectConfig = JSON.parse(configString);
-				if (projectConfig && projectConfig.enabled === true) {
-					targetProject = projectConfig;
-					targetProject.projectFullPath = f.uri.fsPath;
-					return;					
-				}
-			}
-		});
+	let targetProject: any = GycTools.Utils.getTargetProjectConfig(context);
+	let templateExplorer: FileExplorer = new FileExplorer(context, GycTools.Utils.getTemplatePath(context, targetProject));
 
-		if (hasConfigFile === false) {
+	let initPrject = function () {
+		if (!targetProject) {
 			GycTools.Utils.initializeConfigFile(context);
+			targetProject = GycTools.Utils.getTargetProjectConfig(context);
+			templateExplorer.reFlashRoot();
 			return;
+		} else { //get new config alltimes
+			targetProject = GycTools.Utils.getTargetProjectConfig(context);
 		}
-
 		if (targetProject === undefined) {
 			console.error('gyctool config error , extension disabled');
 			vscode.window.showErrorMessage('gyctool config error , extension disabled');
 			return;
 		}
+	};
 
-		let codeGenerator:CodeGenerator = new CodeGenerator(context,item,targetProject);
-		codeGenerator.generate();
-		return ;
-
+	context.subscriptions.push(vscode.commands.registerCommand('gyctools.generateYourCodes', (item) => {
+		initPrject();
+		const codeGenerator: CodeGenerator = new CodeGenerator(context, item, targetProject);
+		codeGenerator.generateNew();
+		return;
 	}));
 
+	
+
 }
+
 
 // this method is called when your extension is deactivated
 export function deactivate() { }

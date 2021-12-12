@@ -1,20 +1,58 @@
 {
-    "$schema": "https://gskd.sdoprofile.com/schema/gyctools.config.schema.v1.json",
+    "$schema": "https://gskd.sdoprofile.com/schema/gyctools.config.schema.v2.json",
     "projectName": "gvctoolsdemo",
     "projectPath": "gvctoolsdemo",
     "enabled": true,    
-    "baseModelProperties": [
-        "id",
-        "dr",
-        "dataVersion",
-        "createTime",
-        "updateTime"
-    ],
-    "openFileWhenComplete": true,
+    "openFileWhenComplete": false,
+    "templatePath":"",
     "dataBaseList": [
         {
             "dataBaseName": "gyc_tools",
             "tableNamePrefix": "TB_",
+            "templateList": [
+                {
+                    "templateName": "model.njk",
+                    "outFileType": ".java",
+                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/model/",
+                    "enabled": true
+                },
+                {
+                    "templateName": "reader.njk",
+                    "outFileType": "Reader.java",
+                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/reader/",
+                    "enabled": true
+                },
+                {
+                    "templateName": "reader_map.njk",
+                    "outFileType": ".xml",
+                    "outPath": "/gvctoolsdemo-model/src/main/resources/mappers/reader/",
+                    "enabled": true
+                },
+                {
+                    "templateName": "writer.njk",
+                    "outFileType": "Writer.java",
+                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/writer/",
+                    "enabled": true
+                },
+                {
+                    "templateName": "writer_map.njk",
+                    "outFileType": ".xml",
+                    "outPath": "/gvctoolsdemo-model/src/main/resources/mappers/writer/",
+                    "enabled": true
+                },
+                {
+                    "templateName": "service.njk",
+                    "outFileType": "Service.java",
+                    "outPath": "/gvctoolsdemo-service/src/main/java/com/sqg/service/",
+                    "enabled": true
+                },
+                {
+                    "templateName": "service_impl.njk",
+                    "outFileType": "ServiceImpl.java",
+                    "outPath": "/gvctoolsdemo-service/src/main/java/com/sqg/service/impl/",
+                    "enabled": true
+                }
+            ],
             "customsAttributes": {
                 "modelPackageName": "com.sqg.model",
                 "readerPackageName": "com.sqg.reader",
@@ -64,51 +102,14 @@
                 "default": {
                     "result": "String"
                 }
-            },
-            "templateList": [
-                {
-                    "templateName": "model.njk",
-                    "outFileType": ".java",
-                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/model/",
-                    "enabled": true
-                },
-                {
-                    "templateName": "reader.njk",
-                    "outFileType": "Reader.java",
-                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/reader/",
-                    "enabled": true
-                },
-                {
-                    "templateName": "reader_map.njk",
-                    "outFileType": ".xml",
-                    "outPath": "/gvctoolsdemo-model/src/main/resources/mappers/reader/",
-                    "enabled": true
-                },
-                {
-                    "templateName": "writer.njk",
-                    "outFileType": "Writer.java",
-                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/writer/",
-                    "enabled": true
-                },
-                {
-                    "templateName": "writer_map.njk",
-                    "outFileType": ".xml",
-                    "outPath": "/gvctoolsdemo-model/src/main/resources/mappers/writer/",
-                    "enabled": true
-                },
-                {
-                    "templateName": "service.njk",
-                    "outFileType": "Service.java",
-                    "outPath": "/gvctoolsdemo-service/src/main/java/com/sqg/service/",
-                    "enabled": true
-                },
-                {
-                    "templateName": "service_impl.njk",
-                    "outFileType": "ServiceImpl.java",
-                    "outPath": "/gvctoolsdemo-service/src/main/java/com/sqg/service/impl/",
-                    "enabled": true
-                }
-            ]
+            }
         }
+    ],
+    "baseModelProperties": [
+        "id",
+        "dr",
+        "dataVersion",
+        "createTime",
+        "updateTime"
     ]
 }

@@ -3,15 +3,15 @@
 <mapper namespace="{{customsAttributes.readerPackageName}}.{{className}}Reader">
 
 	<resultMap id="{{className}}ResultMap" type="{{ customsAttributes.modelPackageName }}.{{ className }}">
-        {% for property in properties -%}
-			{%- if property.isInBaseModel==false -%}
-				{% if primaryKey and property.isPrimaryKey -%}
+        {% for property in properties %}
+			{% if property.isInBaseModel==false %}
+				{% if primaryKey and property.isPrimaryKey %}
 		<result property="id" column="{{ property.columnName }}"/>
-				{%- else -%}
+				{% else %}
         <result property="{{ property.propertyName }}" column="{{ property.columnName }}"/>
-				{%- endif %}
-			{%- endif %}
-		{% endfor -%}
+				{% endif %}
+			{% endif %}
+		{% endfor %}
 		<result property="createTime" column="CREATE_TIME"/>
 		<result property="updateTime" column="UPDATE_TIME"/>
 		<result property="dr" column="dr" />
@@ -20,11 +20,11 @@
 	
 
 	<sql id="selectClause">
-		{% for property in properties -%}
-			{%- if property.isInBaseModel==false %}
+		{% for property in properties %}
+			{% if property.isInBaseModel==false %}
 		{{ property.columnName }},
-			{%- endif %}
-		{%- endfor %}
+			{% endif %}
+		{% endfor %}
 		create_time,update_time,
 		dr, data_version
 
@@ -45,7 +45,8 @@
 		where
 		{{primaryKey}} = #{id}
 		limit 1
-	</select>{% endif %}
+	</select>
+	{% endif %}
 
 
 	<!--无主键的表不提供get(根据主键)查询-->
@@ -56,7 +57,8 @@
 		where
 		{{primaryKey}} = #{id}
 		limit 1			
-	</select>{% endif %}
+	</select>
+	{% endif %}
 
 	<select id="query" parameterType="com.sqg.sql.Where" resultMap="{{className}}ResultMap">
 		<include refid="baseSelect" />
@@ -66,7 +68,9 @@
 			${whereHead}
 		<trim suffixOverrides="and">
 		<if test="id != null">
-		{% if primaryKey %}{{primaryKey}} = #{id} and {% endif %}
+		{% if primaryKey %}
+		{{primaryKey}} = #{id} and 
+		{% endif %}
 		</if>
 			${whereClause}
 		</trim>
@@ -90,7 +94,9 @@
         ${whereHead}
         <trim suffixOverrides="and">
             <if test="id != null">
-                {% if primaryKey %}{{primaryKey}} = #{id} and {% endif %}
+            {% if primaryKey %}
+			{{primaryKey}} = #{id} and 
+			{% endif %}
             </if>
             ${whereClause}
         </trim>
@@ -106,7 +112,7 @@
     </select>
 
 	<select id="count" parameterType="com.sqg.sql.Where" resultType="java.lang.Integer">
-		select count(*) from {{name}}
+		select count(*) from {{ tableName }}
 		<if test="join != null">
 		${join}
 		</if>

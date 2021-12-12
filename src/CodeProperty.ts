@@ -1,10 +1,11 @@
 import { StringUtils } from './StringUtils';
+import { GycTools } from './GycTools';
 
 export class CodeProperty {
 
     columnName: string;
     dataType: string;
-    isNullable: string;
+    isNullable: boolean;
     comment: string;
     propertyName: string;
     propertyType?: string;
@@ -14,20 +15,18 @@ export class CodeProperty {
     isInBaseModel: boolean = false;
     isPrimaryKey: boolean = false;
     
-    constructor(row: any, baseModelProperties: string[]) {
-        this.columnName = row.COLUMN_NAME;
-        this.dataType = row.DATA_TYPE;
-        this.isNullable = row.IS_NULLABLE;
-        this.comment = row.COLUMN_COMMENT;
-        this.isAutoIncrement = row.EXTRA === 'auto_increment';
+    constructor(row: GycTools.TableColumnInfo, baseModelProperties: string[]) {
+        this.columnName = row.columnName;
+        this.dataType = row.dataType;
+        this.isNullable = row.isNullable;
+        this.comment = row.comment;
+        this.isAutoIncrement = row.isAutoIncrement;
         this.propertyName = StringUtils.toLowerCamelCase(this.columnName);
         this.methodName = StringUtils.toUpperCamelCase(this.columnName);
         if (baseModelProperties.indexOf(this.propertyName) >= 0) {
             this.isInBaseModel = true;
         }
-        if (row.COLUMN_KEY === 'PRI') {
-            this.isPrimaryKey = true;
-        }
+        this.isPrimaryKey=row.isPk;
     }
 
 

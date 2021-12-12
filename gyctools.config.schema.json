@@ -28,6 +28,17 @@
                 "type": "string"
             }
         },
+        "openFileWhenComplete": {
+            "title": "Open File When Complete",
+            "description": "Auto open file when code generate completed.",
+            "type": "boolean"
+        },        
+        "templatePath": {
+            "title": "Customs template path",
+            "description": "Define your templates and set their location at this",
+            "type": "string",
+            "minimum": 1
+        },
         "dataBaseList": {
             "title": "DataBaseList",
             "description": "The project releated database info list. When you select the target table's database in this list,tool will work or not.",
@@ -55,14 +66,10 @@
                         "type": "object"
                     },
                     "customsTypeInterpreterConfig": {
+                        "title": "Customs Type Interpreter Config",
+                        "description":"Mapping the data type to object type. See reade me for examples.",
                         "type": "object",
                         "required": []
-                    },
-                    "templatePath": {
-                        "title": "Customs template path",
-                        "description": "Define your templates and set their location at this",
-                        "type": "string",
-                        "minimum": 1
                     },
                     "templateList": {
                         "title": "Template List",
@@ -100,7 +107,6 @@
                         }
                     }
                 }
-                
             }
         }
     }

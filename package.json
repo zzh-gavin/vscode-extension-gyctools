@@ -1,10 +1,10 @@
 {
 	"name": "gyctools",
-	"displayName": "Generate Your Codes From DataBase",
-	"description": "Generate Your Codes From DataBase by Nunjuck Templating.",
+	"displayName": "EasyProducer",
+	"description": "EasyProducer Generate Your Codes From DataBase By Nunjuck Templating.Esay Coding Enjoy Life.",
 	"publisher": "zzhgavin",
 	"author": "zzh-gavin<leechzhao3@hotmail.com>",
-	"version": "0.0.6",
+	"version": "1.0.0",
 	"license": "MIT",
 	"preview": false,
 	"engines": {
@@ -25,15 +25,23 @@
 		"gen",
 		"generate",
 		"shengqugames",
-		"sqg"
+		"sqg",
+		"easyproducer",
+		"easy",
+		"easycode"
 	],
 	"icon": "icon/icon-256.png",
-	"repository": {"type": "git","url": "https://github.com/zzh-gavin/vscode-extension-gyctools.git"},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/zzh-gavin/vscode-extension-gyctools.git"
+	},
 	"extensionDependencies": [
-		"mtxr.sqltools"
+		"mtxr.sqltools",
+		"mtxr.sqltools-driver-mysql",
+		"eseom.nunjucks-template"
 	],
 	"activationEvents": [
-		"onLanguage:java",
+		"*",
 		"onView:sqltoolsViewConnectionExplorer"
 	],
 	"main": "./out/extension.js",
@@ -41,15 +49,73 @@
 		"commands": [
 			{
 				"command": "gyctools.generateYourCodes",
-				"title": "Generate Your Codes"
+				"title": "EasyProducer->Generate Your Codes"
+			},
+			{
+				"command": "gyctools.openTemplateFile",
+				"title": "Open Resource"
+			},
+			{
+				"command": "gyctools.renameTemplateFile",
+				"title": "Rename Template"
+			},
+			{
+				"command": "gyctools.deleteTemplateFile",
+				"title": "Delete Template"
+			},
+			{
+				"command": "gyctools.addTemplateFile",
+				"title": "Add New Template",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				}
+			},
+			{
+				"command": "gyctools.refreshTemplateFile",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
 			}
 		],
 		"menus": {
+			"view/title": [
+				{
+					"command": "gyctools.addTemplateFile",
+					"when": "view == gyctoolsViewTemplateExplorer",
+					"group": "navigation"
+				},
+				{
+					"command": "gyctools.refreshTemplateFile",
+					"when": "view == gyctoolsViewTemplateExplorer",
+					"group": "navigation"
+				}
+			],
 			"view/item/context": [
 				{
 					"command": "gyctools.generateYourCodes",
 					"when": "view == sqltoolsViewConnectionExplorer && viewItem =~ /^connection\\.(table|view)$/",
+					"group": "GYC_TOOLS"
+				},
+				{
+					"command": "gyctools.renameTemplateFile",
+					"when": "view == gyctoolsViewTemplateExplorer",
 					"group": "navigation"
+				},
+				{
+					"command": "gyctools.deleteTemplateFile",
+					"when": "view == gyctoolsViewTemplateExplorer",
+					"group": "navigation"
+				}
+			]
+		},
+		"views": {
+			"explorer": [
+				{
+					"id": "gyctoolsViewTemplateExplorer",
+					"name": "EasyProducer GYC Tools Templaters"
 				}
 			]
 		}
@@ -64,10 +130,13 @@
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.4",
+		"@types/mkdirp": "^1.0.2",
 		"@types/mocha": "^9.0.0",
+		"@types/mssql": "^7.1.4",
 		"@types/mysql": "^2.15.19",
 		"@types/node": "14.x",
 		"@types/nunjucks": "^3.2.0",
+		"@types/rimraf": "^3.0.2",
 		"@types/vscode": "^1.62.0",
 		"@typescript-eslint/eslint-plugin": "^4.31.1",
 		"@typescript-eslint/parser": "^4.31.1",
@@ -78,6 +147,7 @@
 		"typescript": "^4.4.3"
 	},
 	"dependencies": {
+		"mssql": "^7.3.0",
 		"mysql": "^2.18.1",
 		"nunjucks": "^3.2.3"
 	}
