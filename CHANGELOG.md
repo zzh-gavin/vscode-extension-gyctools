@@ -39,3 +39,4 @@
 ## [1.0.0]
 
 - Rename to "EasyProducer GycTools".
+- fix other issues.
