@@ -1,6 +1,8 @@
-# GYC TOOLS
+# EasyProducer-GYC
 
-This is a tool for generate your code(all programming language up to you) or maybatis map-file from database table definition.
+This is a tool for Generate Your Code(all programming languages or maybatis map-files and so on, up to you) from database table definition. Befor using it, you need know how work it is. So please read this document and config this tool for your own projects by ".vscode/gyctools.config.json".
+
+And if you like this tool,please give us a star.thanks.
 
 ## Extension Dependencies
 
@@ -14,21 +16,68 @@ If want use this tools,you must install [SQLTools](https://marketplace.visualstu
 
 Install [SQLTools](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools) and [SQLTools MySQL/MariaDB driver](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools-driver-mysql) is necessarily.And the connection setting mast use 'Server and Port' and the password need select 'Save password' if not this tool can't connect to db server.
 
+* Here is  SQLtoos connection config sample
+
+``` json
+"sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server":"127.0.0.1",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "GYSTools",
+            "group": "GYSTools",
+            "database": "gyc_tools",
+            "username": "gyctools",
+            "password": "gyctools"
+        },
+        {
+            "mssqlOptions": {
+                "appName": "SQLTools",
+                "useUTC": true,
+                "encrypt": false
+            },
+            "previewLimit": 500,
+            "server": "127.0.0.1",
+            "port": 1433,
+            "driver": "MSSQL",
+            "name": "GYSTools",
+            "database": "GYSTools",
+            "username": "gyctools",
+            "password": "gyctools"
+        }
+]
+```
+
+So EasyProducer-GYC need the username and password to connect the target databse.It's important use dev db not product to protect your information.
+
 ### MsSQL
 
 Install [SQLTools](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools) and [SQLTools MicrosoftSQL Server/Azure driver](https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools-driver-mssql) is necessarily. And the connection setting mast use 'Server and Port' and the password need select 'Save password' if not this tool can't connect to db server.
 
 ## Usage
 
-![Usage](https://gskd.sdoprofile.com/schema/gyctools.gif)
+* Entry
+
+![Usage](https://gskd.sdoprofile.com/schema/menuplace.jpg)
 
 ## Features
 
 * generate all language from db table by [Nunjucks](https://github.com/mozilla/nunjucks) template
 
 * two kind instance take part in the Nunjucks template.
-  * CodeEntity is db table info, the properties can used in your template:
+  * CodeEntity is db table info, the properties can used in your template like this:
+  
+  ```njk
+  {{dbType}}
+  {{tableName}}
+  {{className}}
+  {{primaryKey}}
+  ...
+  ```
 
+  * Here is features for CodeEntity
+  
   ``` typescript
     //database type , currently we only support MySQL.this fiedl value samed with SQLTools driver name.
     dbType: String;
@@ -52,18 +101,39 @@ Install [SQLTools](https://marketplace.visualstudio.com/items?itemName=mtxr.sqlt
 
   * CodeProperty is table columns info, the properties can used in your template by {{properties}}:
   
+  ```njk
+    {% for property in properties %}
+        {% if property.isInBaseModel==false and property.columnName != primaryKey %}
+    private {{ property.propertyType }} {{ property.propertyName }};
+        {% endif %}
+    {% endfor %}
+  ```
+  
+  * Here is features for CodeProperty
+
   ``` typescript
+    //table's column name
     columnName: string;
+    //data type
     dataType: string;
-    isNullable: string;
-    comment: string;
-    propertyName: string;
-    propertyType?: string;
-    methodName: string;
+    //data allowed null
+    isNullable: boolean;
+    //column is index and auto sequences
     isAutoIncrement: boolean;
-    importTypeName?: string;
-    isInBaseModel: boolean = false;
+    //column's comment info
+    comment: string;
+    //column is pk
     isPrimaryKey: boolean = false;
+    //code(entity\pojo\object) field name translate from dataType 
+    propertyName: string;
+    //code field type
+    propertyType?: string;
+    //code field methodName for java's get set function
+    methodName: string;
+    //code field need import/requir thirdparty class/object
+    importTypeName?: string;
+    //field is defined in base object
+    isInBaseModel: boolean = false;
   ```
 
 ## Extension Config File Manual
@@ -72,7 +142,7 @@ When tools activated,it will read tool config from "./vscode/gyctools.config.jso
 
 ## Code Template Info
 
-Tools has a bundle of templates in extension installation directory "template-sqg-spring",it's a java-spring and a private template demo you to edit them for youself style. Alternatively,you can contact us for help. And then you can set the template folder in gyctools.config by "dataBaseList.item.templatePath".
+Tools has a bundle of templates in extension installation directory "template-sqg-spring",it's a java-spring and a private template demo you to edit them for youself style. Alternatively,you can contact us help you for your own templates. And then you can set the template folder in gyctools.config by "dataBaseList.item.templatePath".
 
 ### Language Type Interpreter
 
@@ -128,6 +198,7 @@ If that is not what your want,then can define a 'customsTypeInterpreterConfig' i
     "enabled": true,    
     "openFileWhenComplete": false,
     "templatePath":"",
+    "overrideExists":true,
     "dataBaseList": [
         {
             "dataBaseName": "gyc_tools",
@@ -252,3 +323,7 @@ you also can add config schema relation by vscode setting eg "json.schemas"::
     }
     
 ```
+
+## Contact
+
+* leechzhao3@hotmail.com  Looking Forward to Your Advice.

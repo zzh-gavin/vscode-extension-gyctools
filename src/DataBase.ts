@@ -1,9 +1,12 @@
-import { GycTools } from './GycTools';
-import * as mysql from 'mysql';
+
 import * as vscode from 'vscode';
 import * as mssql from 'mssql';
+// import * as mysql from 'mysql';
+import { GycTools } from './GycTools';
+import { Pool, PoolConnection } from 'mysql';
 
-export function columnQuerierFactory(selectItem: any): ColumnQuerier {
+
+export function columnQuerierFactory(selectItem: any): GycTools.ColumnQuerier {
     switch (selectItem.conn.driver.toLowerCase()) {
         case 'mysql':
             return new MySqlColumnQuerier(selectItem);
@@ -12,10 +15,10 @@ export function columnQuerierFactory(selectItem: any): ColumnQuerier {
         default:
             return new MySqlColumnQuerier(selectItem);
     }
-    
+
 }
 
-export class MsSqlColumnQuerier implements ColumnQuerier {
+export class MsSqlColumnQuerier implements GycTools.ColumnQuerier {
     databaseType: string = 'MsSQL';
     databaseName: string;
     tableName: string;
@@ -28,16 +31,24 @@ export class MsSqlColumnQuerier implements ColumnQuerier {
         this.tableName = selectedItem.value;
         this.databaseName = selectedItem.conn.database;
         this.connectionString = selectedItem.conn.connectString;
-        this.connectionConfig = {
-            database: selectedItem.conn.database,
-            server: selectedItem.conn.server,
-            user: selectedItem.conn.username,
-            password: selectedItem.conn.password,
-            domain: selectedItem.conn.domain || undefined,
-            port: selectedItem.conn.port,
-            options: selectedItem.conn.mssqlOptions
-        };
+        this.connectionConfig = this.getConnection(selectedItem.conn);
+    }
 
+    private getConnection(conn: GycTools.ConnectionConfig): mssql.config {
+        if (GycTools.Utils.checkConnectionConfig(conn)) {
+            return {
+                database: conn.database,
+                server: conn.server,
+                user: conn.username,
+                password: conn.password,
+                domain: conn.domain || undefined,
+                port: conn.port,
+                options: conn.mssqlOptions
+            };
+        } else {
+            console.error('Connection Config Info Error');
+        }
+        return undefined;
     }
 
 
@@ -76,7 +87,13 @@ export class MsSqlColumnQuerier implements ColumnQuerier {
         where c.TABLE_NAME='${this.tableName}' AND C.TABLE_CATALOG ='${this.databaseName}'
         `;
         this.connectionPool = await mssql.connect(this.connectionString || this.connectionConfig);
-        return this.getColumnInfo(this.connectionPool, sqlCommand);
+        if(this.connectionPool.connected){
+            return this.getColumnInfo(this.connectionPool, sqlCommand);
+        }else{
+            vscode.window.showErrorMessage('database connect state error');
+            return undefined;
+        }
+        
     }
 
     private getColumnInfo(connect: mssql.ConnectionPool, sqlCommand: string): Promise<any> {
@@ -100,23 +117,34 @@ export class MsSqlColumnQuerier implements ColumnQuerier {
 
 
 
-export class MySqlColumnQuerier implements ColumnQuerier {
+export class MySqlColumnQuerier implements GycTools.ColumnQuerier {
+
     databaseType: string = 'MySQL';
     databaseName: string;
     tableName: string;
-    connection: mysql.Connection;
+    connection: Pool;
 
     constructor(selectedItem: any) {
         this.tableName = selectedItem.value;
         this.databaseName = selectedItem.conn.database;
-        this.connection = mysql.createConnection({
-            host: selectedItem.conn.server,
-            port: selectedItem.conn.port,
-            user: selectedItem.conn.username,
-            password: selectedItem.conn.password,
-            database: selectedItem.conn.database,
-            connectTimeout: 2000
-        });
+        this.connection = this.getConnection(selectedItem.conn);
+    }
+
+    private getConnection(conn: GycTools.ConnectionConfig): Pool {
+        var mysql = require('mysql');
+        if (GycTools.Utils.checkConnectionConfig(conn)) {
+            return mysql.createPool({
+                host: conn.server,
+                port: conn.port,
+                user: conn.username,
+                password: conn.password,
+                database: conn.database,
+                connectTimeout: 2000
+            });
+        } else {
+            console.error('Connection Config Info Error');
+        }
+        return undefined;
     }
 
 
@@ -132,13 +160,31 @@ export class MySqlColumnQuerier implements ColumnQuerier {
         TABLE_SCHEMA AS databaseName
         FROM information_schema.COLUMNS where TABLE_NAME = '${this.tableName}' AND TABLE_SCHEMA ='${this.databaseName}'
         `;
-        this.connection.connect((e) => {
-            console.error(e);
-            vscode.window.showErrorMessage(e.message);
+
+        return new Promise<Array<GycTools.TableColumnInfo>>( ( resolve, reject ) => {
+            this.connection.getConnection((error,connection)=>{
+                if(error){
+                    reject(error);
+                }else{
+                    resolve( this.getColumnInfo(connection,sqlCommand) );
+                }
+            });
         });
-        const queryResult = GycTools.Utils.getColumnInfo(this.connection, sqlCommand);
-        return queryResult;
     }
+
+    private getColumnInfo(connect: PoolConnection, sqlCommand: string): Promise<any> {
+        return new Promise(function (resolve, reject) {
+            connect.query(sqlCommand, (error, result) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+                connect.release();
+            });
+        });
+    }
+
 
     public close() {
         this.connection.end();
@@ -147,11 +193,3 @@ export class MySqlColumnQuerier implements ColumnQuerier {
 }
 
 
-
-export interface ColumnQuerier {
-    databaseType: string;
-    databaseName: string;
-    tableName: string;
-    getTableColumnInfo(): Promise<Array<GycTools.TableColumnInfo>>
-    close();
-}

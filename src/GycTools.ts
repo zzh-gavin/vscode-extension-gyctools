@@ -3,12 +3,35 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import { Connection } from 'mysql';
 import * as os from 'os';
 
 export namespace GycTools {
 
 	export class Utils {
+
+		public static checkConnectionConfig(conn:GycTools.ConnectionConfig):boolean{
+			if(!conn.server || conn.server.length < 1){
+                console.error(GycTools.Constants.MSG_CONNECTION_ERROR_NO_SERVER);
+                vscode.window.showErrorMessage(GycTools.Constants.MSG_CONNECTION_ERROR_NO_SERVER);
+				return false;
+            }
+            if(!conn.port || conn.port < 1){
+                console.error(GycTools.Constants.MSG_CONNECTION_ERROR_NO_SERVER);
+                vscode.window.showErrorMessage(GycTools.Constants.MSG_CONNECTION_ERROR_NO_SERVER);
+				return false;
+            }
+			if(!conn.username || conn.username.length < 1){
+                console.error(GycTools.Constants.MSG_CONNECTION_ERROR_NO_USER);
+                vscode.window.showErrorMessage(GycTools.Constants.MSG_CONNECTION_ERROR_NO_USER);
+				return false;
+            }
+			if(!conn.password || conn.password.length < 1){
+                console.error(GycTools.Constants.MSG_CONNECTION_ERROR_NO_USER);
+                vscode.window.showErrorMessage(GycTools.Constants.MSG_CONNECTION_ERROR_NO_USER);
+				return false;
+            }
+			return true;
+		}
 
 		public static getTargetProjectConfig(context: vscode.ExtensionContext): any {
 			let targetProject: ProjectConfig;
@@ -64,17 +87,7 @@ export namespace GycTools {
 			return;
 		}
 
-		public static getColumnInfo(connect: Connection, sqlCommand: string): Promise<any> {
-			return new Promise(function (resolve, reject) {
-				connect.query(sqlCommand, (error, result) => {
-					if (error) {
-						reject(error);
-					} else {
-						resolve(result);
-					}
-				});
-			});
-		}
+		
 
 	}
 
@@ -86,6 +99,23 @@ export namespace GycTools {
 		static defaultTemplateDirectory = 'template_sqg_spring';
 
 		static defaultTemplateUserDirectory = ".gyctools_templates";
+
+		// eslint-disable-next-line @typescript-eslint/naming-convention
+		static MSG_CONNECTION_ERROR_NO_SERVER = 'Db Connection Config Error. Must use server & port style.';
+
+		// eslint-disable-next-line @typescript-eslint/naming-convention
+		static MSG_CONNECTION_ERROR_NO_USER = 'Db Connection Config Error. Must use server & port style.And must save passord';
+
+	}
+
+	export interface ConnectionConfig{
+		server:string;
+		port: number;
+		username:string;
+		password:string;
+		database:string;
+		mssqlOptions:any;
+		domain:string;
 	}
 
 	export interface ProjectConfig {
@@ -106,6 +136,8 @@ export namespace GycTools {
 		projectFullPath: string;
 
 		templatePath: string;
+
+		overrideExists:boolean;
 	}
 
 	export interface DatabaseConfig {
@@ -133,6 +165,14 @@ export namespace GycTools {
 		comment:string;
 		isPk:boolean;
 		isAutoIncrement:boolean;
+	}
+
+	export interface ColumnQuerier {
+		databaseType: 'MySQL' | 'MsSQL' | string ;
+		databaseName: string;
+		tableName: string;
+		getTableColumnInfo(): Promise<Array<GycTools.TableColumnInfo>>
+		close():void;
 	}
 
 }

@@ -1,10 +1,10 @@
 {
 	"name": "gyctools",
-	"displayName": "EasyProducer",
-	"description": "EasyProducer Generate Your Codes From DataBase By Nunjuck Templating.Esay Coding Enjoy Life.",
+	"displayName": "EasyProducer-GYC",
+	"description": "Generate Your Codes From DataBase By Nunjuck Templating.Esay Coding Enjoy Life is EasyProducer.",
 	"publisher": "zzhgavin",
 	"author": "zzh-gavin<leechzhao3@hotmail.com>",
-	"version": "1.0.0",
+	"version": "1.0.4",
 	"license": "MIT",
 	"preview": false,
 	"engines": {
@@ -41,8 +41,7 @@
 		"eseom.nunjucks-template"
 	],
 	"activationEvents": [
-		"*",
-		"onView:sqltoolsViewConnectionExplorer"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -110,6 +109,7 @@
 					"group": "navigation"
 				}
 			]
+			
 		},
 		"views": {
 			"explorer": [
@@ -133,7 +133,6 @@
 		"@types/mkdirp": "^1.0.2",
 		"@types/mocha": "^9.0.0",
 		"@types/mssql": "^7.1.4",
-		"@types/mysql": "^2.15.19",
 		"@types/node": "14.x",
 		"@types/nunjucks": "^3.2.0",
 		"@types/rimraf": "^3.0.2",
@@ -147,8 +146,10 @@
 		"typescript": "^4.4.3"
 	},
 	"dependencies": {
+		"@types/mysql": "^2.15.20",
 		"mssql": "^7.3.0",
 		"mysql": "^2.18.1",
-		"nunjucks": "^3.2.3"
+		"nunjucks": "^3.2.3",
+		"rimraf": "^3.0.2"
 	}
 }

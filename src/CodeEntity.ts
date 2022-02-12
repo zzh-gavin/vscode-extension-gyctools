@@ -2,7 +2,6 @@ import { CodeProperty } from "./CodeProperty";
 import { GycTools } from "./GycTools";
 import { StringUtils } from './StringUtils';
 import { TypeInterpreter, TypeInterpreterFactory } from './TypeInterpreter';
-import { ColumnQuerier } from './DataBase';
 
 export class CodeEntity {
 
@@ -12,25 +11,29 @@ export class CodeEntity {
     tableName: string;
     //conversion from tableName
     className: string;
-    //table's primary key 
+    //table's first primary key 
     primaryKey?: string;
     //table's auto increment column name
     autoIncrementKey?: string;
     //conversion from table columns 
-    properties: Array<CodeProperty>;    
+    properties: Array<CodeProperty>;
     //if the column conversion need import code, see TypeInterpreter Config
     importArray: Array<string> = new Array<string>();
     //custom attributes from config file
-    customsAttributes: any;   
+    customsAttributes: any;
     //table name prefix from config file
     tableNamePrefix: string;
+    //table's all primary key
+    primarykeyArray: Array<string> = new Array<string>();
+    //table's all primary key translated to property
+    primaryKeyPropertyArray: Array<string> = new Array<string>();
 
     template: any;
-   
+
 
     private typeInterpreter: TypeInterpreter;
 
-    constructor(columnQuerier: ColumnQuerier, queryResult: any, baseModelProperties: string[], dataBaseConfig: GycTools.DatabaseConfig) {
+    constructor(columnQuerier: GycTools.ColumnQuerier, queryResult: any, baseModelProperties: string[], dataBaseConfig: GycTools.DatabaseConfig) {
         dataBaseConfig.databaseType = columnQuerier.databaseType;
         this.typeInterpreter = TypeInterpreterFactory.getInstance(dataBaseConfig);
         this.dbType = columnQuerier.databaseType;
@@ -40,7 +43,7 @@ export class CodeEntity {
         if (!this.tableNamePrefix) {
             this.className = StringUtils.toUpperCamelCase(this.tableName);
         } else {
-            if ( this.tableNamePrefix.length>0 &&  this.tableName.startsWith(this.tableNamePrefix) ) {
+            if (this.tableNamePrefix.length > 0 && this.tableName.startsWith(this.tableNamePrefix)) {
                 this.className = StringUtils.toUpperCamelCase(this.tableName.substring(this.tableNamePrefix.length));
             } else {
                 this.className = StringUtils.toUpperCamelCase(this.tableName);
@@ -55,7 +58,11 @@ export class CodeEntity {
 
             this.typeInterpreter.getTypeImport(this.importArray, columnInfo.dataType);
             if (columnInfo.isPrimaryKey) {
-                this.primaryKey = columnInfo.columnName;
+                if (!this.primaryKey) {
+                    this.primaryKey = columnInfo.columnName;
+                }
+                this.primarykeyArray.push(columnInfo.columnName);
+                this.primaryKeyPropertyArray.push(columnInfo.propertyName);
             }
             if (columnInfo.isAutoIncrement) {
                 this.autoIncrementKey = columnInfo.columnName;

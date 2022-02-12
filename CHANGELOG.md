@@ -39,4 +39,7 @@
 ## [1.0.0]
 
 - Rename to "EasyProducer GycTools".
-- fix other issues.
+
+## [1.0.1]
+
+- Project config add feature:overrideExists.

@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as rimraf from 'rimraf';
-import { stringify } from 'querystring';
 import { GycTools } from './GycTools';
 import { TemplateCompletionItemProvider } from './templateCompletionItemProvider';
 

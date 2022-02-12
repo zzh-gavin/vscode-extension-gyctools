@@ -1,10 +1,11 @@
 {
-    "$schema": "https://gskd.sdoprofile.com/schema/gyctools.config.schema.v2.json",
+    "$schema": "https://gskd.sdoprofile.com/schema/gyctools.config.schema.v1.json",
     "projectName": "gvctoolsdemo",
     "projectPath": "gvctoolsdemo",
     "enabled": true,    
     "openFileWhenComplete": false,
     "templatePath":"",
+    "overrideExists":true,
     "dataBaseList": [
         {
             "dataBaseName": "gyc_tools",
