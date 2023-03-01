@@ -1,107 +1,94 @@
 {
-    "$schema": "https://gskd.sdoprofile.com/schema/gyctools.config.schema.v1.json",
-    "projectName": "gvctoolsdemo",
-    "projectPath": "gvctoolsdemo",
+    "$schema": "gyctools.config.schema.json",
+    "projectName": "patella",
+    "projectPath": "patella",
     "enabled": true,    
     "openFileWhenComplete": false,
     "templatePath":"",
     "overrideExists":true,
     "dataBaseList": [
         {
-            "dataBaseName": "gyc_tools",
+            "dataBaseName": "patella",
             "tableNamePrefix": "TB_",
             "templateList": [
                 {
-                    "templateName": "model.njk",
+                    "templateName": "/java/object.njk",
                     "outFileType": ".java",
-                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/model/",
+                    "outPath": "/patella/java/",
                     "enabled": true
                 },
                 {
-                    "templateName": "reader.njk",
-                    "outFileType": "Reader.java",
-                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/reader/",
+                    "templateName": "/java/mybatis_dao.njk",
+                    "outFileType": "DAO.java",
+                    "outPath": "/patella/java/",
                     "enabled": true
                 },
                 {
-                    "templateName": "reader_map.njk",
+                    "templateName": "/java/mybatis_dao_map.njk",
                     "outFileType": ".xml",
-                    "outPath": "/gvctoolsdemo-model/src/main/resources/mappers/reader/",
-                    "enabled": true
+                    "outPath": "/patella/resources/mybatis/",
+                    "enabled": true,
+                    "language":"java"
                 },
                 {
-                    "templateName": "writer.njk",
-                    "outFileType": "Writer.java",
-                    "outPath": "/gvctoolsdemo-model/src/main/java/com/sqg/writer/",
-                    "enabled": true
+                    "templateName": "/typescript/interface.njk",
+                    "outFileType": ".ts",
+                    "outPath": "/patella/typescript/",
+                    "enabled": true,
+                    "customsTypeInterpreterConfig": {
+                        "int": {
+                            "result": "number"
+                        },
+                        "another_ts_db_type": {
+                            "result": "your_language_ts_type_name",
+                            "importTypeName": "import {vscode} from 'vscode'"
+                        },
+                        "default": {
+                            "result": "string"
+                        }
+                    }
                 },
                 {
-                    "templateName": "writer_map.njk",
-                    "outFileType": ".xml",
-                    "outPath": "/gvctoolsdemo-model/src/main/resources/mappers/writer/",
-                    "enabled": true
-                },
-                {
-                    "templateName": "service.njk",
-                    "outFileType": "Service.java",
-                    "outPath": "/gvctoolsdemo-service/src/main/java/com/sqg/service/",
-                    "enabled": true
-                },
-                {
-                    "templateName": "service_impl.njk",
-                    "outFileType": "ServiceImpl.java",
-                    "outPath": "/gvctoolsdemo-service/src/main/java/com/sqg/service/impl/",
-                    "enabled": true
+                    "templateName": "/csharp/object.njk",
+                    "outFileType": ".cs",
+                    "outPath": "/patella/csharp/",
+                    "enabled": true,
+                    "customsTypeInterpreterConfig": {
+                        "int": {
+                            "result": "Int32",
+                            "importTypeName": "System"
+                        },
+                        "datetime": {
+                            "result": "Date",
+                            "importTypeName": "System"
+                        },
+                        "another_ts_db_type": {
+                            "result": "your_language_ts_type_name",
+                            "importTypeName": "System.Date"
+                        },
+                        "default": {
+                            "result": "String",
+                            "importTypeName": "System"
+                        }
+                    }
                 }
             ],
             "customsAttributes": {
-                "modelPackageName": "com.sqg.model",
-                "readerPackageName": "com.sqg.reader",
-                "writerPackageName": "com.sqg.writer",
-                "servicePackageName": "com.sqg.service",
-                "serviceImplPackageName": "com.sqg.service.impl"
+                "author": "leechzhao3@hotmail.com",
+                "modelPackageName": "com.patella.model",
+                "readerPackageName": "com.patella.reader",
+                "writerPackageName": "com.patella.writer",
+                "servicePackageName": "com.patella.service",
+                "serviceImplPackageName": "com.patella.service.impl",
+                "cSharpObjectNameSpace": "patella"
             },
             "customsTypeInterpreterConfig": {
-                "int": {
-                    "result": "Integer"
-                },
-                "tinyint": {
-                    "result": "Integer"
-                },
-                "smallint": {
-                    "result": "Integer"
-                },
-                "varchar": {
-                    "result": "String"
-                },
-                "datetime": {
-                    "result": "Date",
-                    "importTypeName": "java.util.Date"
-                },
-                "timestamp": {
-                    "result": "Date",
-                    "importTypeName": "java.util.Date"
-                },
-                "date": {
-                    "result": "Date",
-                    "importTypeName": "java.util.Date"
-                },
-                "time": {
-                    "result": "Date",
-                    "importTypeName": "java.util.Date"
-                },
-                "decimal": {
-                    "result": "BigDecimal",
-                    "importTypeName": "java.math.BigDecimal"
-                },
-                "bit": {
-                    "result": "Boolean"
-                },
-                "bigint": {
-                    "result": "Long"
+                "another_db_type": {
+                    "result": "your_language_type_name",
+                    "importTypeName": "import {vscode} from 'vscode'"
                 },
                 "default": {
-                    "result": "String"
+                    "result": "string"
                 }
             }
         }

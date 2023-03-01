@@ -1,10 +1,10 @@
 {
 	"name": "gyctools",
-	"displayName": "EasyProducer-GYC",
-	"description": "Generate Your Codes From DataBase By Nunjuck Templating.Esay Coding Enjoy Life is EasyProducer.",
+	"displayName": "Patella",
+	"description": "Patella !! Generate Codes From DataBase By Nunjuck Templating.",
 	"publisher": "zzhgavin",
 	"author": "zzh-gavin<leechzhao3@hotmail.com>",
-	"version": "1.0.4",
+	"version": "1.3.2",
 	"license": "MIT",
 	"preview": false,
 	"engines": {
@@ -16,6 +16,7 @@
 		"Programming Languages"
 	],
 	"keywords": [
+        "patella",
 		"mysql",
 		"mybatis",
 		"database",
@@ -47,8 +48,16 @@
 	"contributes": {
 		"commands": [
 			{
+				"command": "gyctools.generateDatabaseSpecification",
+				"title": "Patella->Generate DB Specification"
+			},
+            {
+				"command": "gyctools.generateCodeByAllTable",
+				"title": "Patella->Generate Codes(ALL TABLE)"
+			},
+			{
 				"command": "gyctools.generateYourCodes",
-				"title": "EasyProducer->Generate Your Codes"
+				"title": "Patella->Generate Codes"
 			},
 			{
 				"command": "gyctools.openTemplateFile",
@@ -94,9 +103,19 @@
 			],
 			"view/item/context": [
 				{
+					"command": "gyctools.generateDatabaseSpecification",
+					"when": "view == sqltoolsViewConnectionExplorer && viewItem =~ /^connection\\.(database)$/",
+					"group": "Patella"
+				},
+                {
+					"command": "gyctools.generateCodeByAllTable",
+					"when": "view == sqltoolsViewConnectionExplorer && viewItem =~ /^connection\\.(database)$/",
+					"group": "Patella"
+				},
+				{
 					"command": "gyctools.generateYourCodes",
 					"when": "view == sqltoolsViewConnectionExplorer && viewItem =~ /^connection\\.(table|view)$/",
-					"group": "GYC_TOOLS"
+					"group": "Patella"
 				},
 				{
 					"command": "gyctools.renameTemplateFile",
@@ -115,10 +134,22 @@
 			"explorer": [
 				{
 					"id": "gyctoolsViewTemplateExplorer",
-					"name": "EasyProducer GYC Tools Templaters"
+					"name": "Patella Templaters"
 				}
 			]
-		}
+		},
+		"configuration":[
+			{
+				"title": "Patella",
+				"properties": {
+					"gyctools.templatePath":{
+						"type":"string",
+						"default":"",
+						"description": "Set root code template folder path.Then patella well not to copy templates in '.vscode' every time."
+					}
+				}
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

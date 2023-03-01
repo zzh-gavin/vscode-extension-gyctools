@@ -39,6 +39,11 @@
             "type": "string",
             "minimum": 1
         },
+        "overrideExists": {
+            "title": "Auto override exists files",
+            "description": "Auto override exists files when true",
+            "type": "boolean"
+        },
         "dataBaseList": {
             "title": "DataBaseList",
             "description": "The project releated database info list. When you select the target table's database in this list,tool will work or not.",
@@ -85,23 +90,34 @@
                             "properties": {
                                 "templateName": {
                                     "title": "Template Name",
-                                    "description": "The Nunjucks template file name.",
+                                    "description": "The Nunjucks template file name.Value of this template's path and file name, except base directory 'gyc_template'.",
                                     "type": "string"
                                 },
                                 "outPath": {
                                     "title": "Out File Path",
-                                    "description": "The output filename's location.",
+                                    "description": "The output file's location.",
                                     "type": "string"
                                 },
                                 "outFileType": {
                                     "title": "Out File Type",
-                                    "description": "The output filename's additions. eg: 'outFileType':'Reader.java'  then the code file will be named 'classNameReader.java'",
+                                    "description": "The output filename's additions. eg: 'outFileType':'Reader.java'  then the generated file will be named 'classNameReader.java'",
                                     "type": "string"
                                 },
                                 "enabled": {
                                     "title": "Enabled",
-                                    "description": "This template will be done when this value equal to true.",
+                                    "description": "This template is availabled when this value equal to true.",
                                     "type": "boolean"
+                                },
+                                "language": {
+                                    "title": "Language",
+                                    "description": "Set this template will be converted by the language type interpreter. exp:java,ts(TypeScript),cs(CSharp)...",
+                                    "type": "string"
+                                },
+                                "customsTypeInterpreterConfig": {
+                                    "title": "Customs Type Interpreter Config",
+                                    "description":"Mapping the data type to object type. See reade me for examples.This setting will cover the project's customsTypeInterpreterConfig setting",
+                                    "type": "object",
+                                    "required": []
                                 }
                             }
                         }

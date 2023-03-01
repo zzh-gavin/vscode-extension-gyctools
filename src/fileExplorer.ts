@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as rimraf from 'rimraf';
 import { GycTools } from './GycTools';
-import { TemplateCompletionItemProvider } from './templateCompletionItemProvider';
+import { TemplateCompletionItemProvider } from './TemplateCompletionItemProvider';
 
 //#region Utilities
 

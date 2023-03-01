@@ -33,7 +33,7 @@ export namespace GycTools {
 			return true;
 		}
 
-		public static getTargetProjectConfig(context: vscode.ExtensionContext): any {
+		public static getTargetProjectConfig(context: vscode.ExtensionContext): ProjectConfig {
 			let targetProject: ProjectConfig;
 			vscode.workspace.workspaceFolders?.forEach((f) => {
 				var configFile = path.join(f.uri.fsPath, GycTools.Constants.projectConfigPath, GycTools.Constants.configFileName);
@@ -43,6 +43,10 @@ export namespace GycTools {
 					if (projectConfig && projectConfig.enabled === true) {
 						targetProject = projectConfig;
 						targetProject.projectFullPath = f.uri.fsPath;
+						const tpConig = vscode.workspace.getConfiguration().get<string>('gyctools.templatePath','');
+						if( targetProject && ( !targetProject.templatePath || targetProject.templatePath.length<=0)){
+							targetProject.templatePath = tpConig;
+						}
 						return;
 					}
 				}
@@ -50,24 +54,47 @@ export namespace GycTools {
 			return targetProject;
 		}
 
-		public static inistializeTemplate(context: vscode.ExtensionContext): void {
-			const sourcePath = path.join(context.extensionPath, GycTools.Constants.defaultTemplateDirectory);
-			const targetPath = path.join(os.homedir(), GycTools.Constants.defaultTemplateUserDirectory);
-			if (!fs.existsSync(targetPath)) {
-				fs.mkdirSync(targetPath, { recursive: true });
-				let files = fs.readdirSync(sourcePath);
-				files.forEach((f) => {
-					fs.copyFileSync(path.join(sourcePath, f), path.join(targetPath, f));
-				});
+		public static inistializeTemplate(context: vscode.ExtensionContext,tpConfig:string): void {
+			if(!tpConfig || tpConfig.trim().length<=0){
+				const sourcePath = path.join(context.extensionPath, GycTools.Constants.defaultTemplateDirectory);
+				const targetPath = GycTools.Utils.getDefaultTmplatePath();
+				if (!fs.existsSync(targetPath)) {
+					fs.mkdirSync(targetPath, { recursive: true });
+					GycTools.Utils.copyFiles(sourcePath,targetPath);
+				}
 			}
+		}
+
+		public static copyFiles(sourcePath:fs.PathLike,targetPath:fs.PathLike){
+			let files = fs.readdirSync(sourcePath, { withFileTypes: true });
+			files.forEach((file) => {
+				if(file.isFile()){
+					fs.copyFileSync(path.join(sourcePath.toString(), file.name), path.join(targetPath.toString(), file.name));
+				}else{
+					const newTargetPath = path.join(targetPath.toString(), file.name);
+					if (!fs.existsSync(newTargetPath)) {
+						fs.mkdirSync(newTargetPath, { recursive: true });
+						GycTools.Utils.copyFiles(path.join(sourcePath.toString(), file.name), newTargetPath);
+					}
+				}
+			});
+		}
+
+		public static getDefaultTmplatePath():string {
+			const targetPath = path.join(vscode.workspace.workspaceFolders[0].uri.fsPath,'.vscode','gyc_templates');
+			return targetPath;
 		}
 
 		public static getTemplatePath(context: vscode.ExtensionContext, targetProjectConfig: ProjectConfig): string {
 			if (targetProjectConfig && targetProjectConfig.templatePath && targetProjectConfig.templatePath.length > 0) {
 				return targetProjectConfig.templatePath;
 			} else {
-				return path.join(os.homedir(), GycTools.Constants.defaultTemplateUserDirectory);
-				//return path.join(context.extensionPath, GycTools.Constants.defaultTemplateDirectory);
+				const tpConig = vscode.workspace.getConfiguration().get<string>('gyctools.templatePath','');
+				if(tpConig && tpConig.length>0){
+					return tpConig;
+				}else{
+					return GycTools.Utils.getDefaultTmplatePath();
+				}
 			}
 		}
 
@@ -75,14 +102,18 @@ export namespace GycTools {
 			const rootPath = (vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 0))
 				? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 			if (!rootPath) {
-				console.error('gyctool config error , extension disabled');
+				console.error('gyctools config error , extension disabled');
 				vscode.window.showErrorMessage('workspace folders not found');
 				return;
 			}
-			let defaultConfigFile = path.join(context.extensionPath, 'gyctools.config.json');
-			let targetFilePath = path.join(rootPath, Constants.projectConfigPath, Constants.configFileName);
+			const defaultConfigFile = path.join(context.extensionPath,  Constants.configFileName);
+			const targetFilePath = path.join(rootPath, Constants.projectConfigPath, Constants.configFileName);
+            const configSchema =  path.join(context.extensionPath, Constants.schemaFileName);
+            const configSchemaTarget = path.join(rootPath, Constants.projectConfigPath, Constants.schemaFileName);
+
 			fs.copyFileSync(defaultConfigFile, targetFilePath);
-			vscode.window.showErrorMessage("please set the gyctools config for your self");
+            fs.copyFileSync(configSchema, configSchemaTarget);
+			vscode.window.showInformationMessage("Please set the gyctools config for new project.");
 			vscode.window.showTextDocument(vscode.Uri.file(targetFilePath), { viewColumn: vscode.ViewColumn.One });
 			return;
 		}
@@ -92,11 +123,15 @@ export namespace GycTools {
 	}
 
 	export class Constants {
+        static myName = 'patella';
+
 		static configFileName = 'gyctools.config.json';
+
+        static schemaFileName = 'gyctools.config.schema.json';
 
 		static projectConfigPath = '.vscode';
 
-		static defaultTemplateDirectory = 'template_sqg_spring';
+		static defaultTemplateDirectory = 'gyc_templates';
 
 		static defaultTemplateUserDirectory = ".gyctools_templates";
 
@@ -106,6 +141,9 @@ export namespace GycTools {
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		static MSG_CONNECTION_ERROR_NO_USER = 'Db Connection Config Error. Must use server & port style.And must save passord';
 
+        static holdingReg: RegExp = /^\s*\W*\s*patella\:holding\s+codes\s+name\s*=\s*(\w+).*$\s*((:?.|\r|\n)+)\r$\s*^(^.*patella:end\s+holding\s+codes\s*\W*$)/m;
+
+        static holdingEndRegs:RegExp = /(^.*patella:end\s+holding\s+codes.*$)/m;
 	}
 
 	export interface ConnectionConfig{
@@ -138,6 +176,8 @@ export namespace GycTools {
 		templatePath: string;
 
 		overrideExists:boolean;
+
+		overrideMode:"all"|"portion";
 	}
 
 	export interface DatabaseConfig {
@@ -156,7 +196,17 @@ export namespace GycTools {
 
 	}
 
+	export interface TableInfo{
+		databaseName:String;
+		databaseType:String;
+		tableName:String;
+		comment:String;
+		columnInfos:Array<TableColumnInfo>;
+		pkCount
+	}
+
 	export interface TableColumnInfo{
+		position:number;
 		databaseName:string;
 		tableName:string;
 		columnName:string;
@@ -165,14 +215,27 @@ export namespace GycTools {
 		comment:string;
 		isPk:boolean;
 		isAutoIncrement:boolean;
+		columnType:string;
+		defaultValue:string;
 	}
 
-	export interface ColumnQuerier {
+	export interface DataQuerier {
 		databaseType: 'MySQL' | 'MsSQL' | string ;
 		databaseName: string;
 		tableName: string;
-		getTableColumnInfo(): Promise<Array<GycTools.TableColumnInfo>>
+		getTableColumnInfo(tableName:String): Promise<Array<GycTools.TableColumnInfo>>;
+		getTableArray(): Promise<Array<GycTools.TableInfo>>;
 		close():void;
+        getTableInfo(tableName:String): Promise<GycTools.TableInfo>;
+	}
+
+	export interface TemplateInfo{
+		templateName:string;
+		outFileType:string;
+		outPath:string;
+		enabled:boolean;
+		language:string;
+		customsTypeInterpreterConfig: Map<string, any>;
 	}
 
 }

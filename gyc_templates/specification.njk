@@ -1,0 +1,103 @@
+<style type="text/css">
+    .table_show {
+        font-size: 13px;
+        table-layout: fixed;
+        empty-cells: show;
+        border-collapse: collapse;
+        margin: 0 auto;
+        border: 1px solid #e7e7e7;
+        table-layout: fixed;
+    }
+
+    .table_show th {
+        height: 22px;
+        font-size: 13px;
+        font-weight: bold;
+        background-color: #CCCCCC;
+        text-align: center;
+    }
+
+    .table_show td {
+        height: 20px;
+        word-wrap: break-word;
+        padding: 0px 5px 0px 5px;
+    }
+
+    .divTitle {
+        margin: 0 auto;
+        width: 100%;
+        height: 60px;
+        font-size: 17px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .divShow {
+        font-size: 14px;
+        font-weight: bold;
+        width: 100%;
+        padding: 10px 0px 10px 0px;
+    }
+
+    .tableTitle {
+        font-size: 15px;
+        height: 24px;
+        font-weight: bold;
+        background-color: #a7a8a8;
+        width: 100%;
+        padding: 5px 0px 0px 5px;
+    }
+</style>
+<br/>
+<div style="margin:10 auto;padding: 10px 15px 10px 15px; width:880px; border:1px #d6d6d6 solid; font-size:12px; line-height:20px;">
+    <div class="divTitle">
+        {{databaseName}} Database Specification<br/>
+        <span style="font-size:14px; font-weight:normal;">{{gDate}}</span>
+    </div>
+    {% for table in tableList %}
+    <div style="margin:0 auto; width:100%; padding-top:10px; ">
+        <div class="tableTitle">NO.{{loop.index}}. Table Name： {{table.tableName}}</div>
+        <div class="divShow"></div>
+    </div>
+    <table width="100%" border="1" class="table_show">
+        <thead>
+        <tr>
+            <th width="70">Sequence</th>
+            <th width="170">Name</th>
+            <th width="140">Type</th>
+            <th width="80">AllowNull</th>
+            <th width="60">PK/INC</th>
+            <th width="70">Default</th>
+            <th>Comment</th>
+        </tr>
+        </thead>
+            {% for column in table.columnInfos %}
+            <tr>
+                <td align="center"><b>{{loop.index}}</b></td>
+                <td>{{column.columnName}}</td>
+                <td>{{column.columnType}}</td>
+                <td align="center">
+                {% if column.isNullable %}
+                    YES
+                    {% else %}
+                    NO
+                {% endif %}
+                </td>
+                <td align="center"> 
+                {% if column.isPk %}
+                    √
+                    {% if column.isAutoIncrement %}
+                        √
+                    {% else %}
+                        ×
+                    {% endif %}
+                {% endif %}
+                </td>
+                <td align="center">{{column.defaultValue}}</td>
+                <td>{{column.comment}}</td>
+            </tr>
+            {% endfor %}
+    </table>
+    <br>
+    {% endfor %}
+</div>
